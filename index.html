@@ -136,15 +136,14 @@
 
     function predecir() {
       if (modelo1 != null && modelo2!=null && modelo3!=null) {
-        resample_single(canvas, 100, 100, otrocanvas);
+        resample_single(canvas, 128, 128, otrocanvas);
 
         //Hacer la predicción
         var ctx2 = otrocanvas.getContext("2d");
-        var imgData = ctx2.getImageData(0,0, 100, 100);
+        var imgData = ctx2.getImageData(0,0, 128, 128);
 
         var arr = [];
         var arr100 = [];
-
         for (var p=0; p < imgData.data.length; p+= 4) {
           var rojo = imgData.data[p] / 255;
           var verde = imgData.data[p+1] / 255;
@@ -152,8 +151,8 @@
 
           var gris = (rojo+verde+azul)/3;
 
-          arr100.push([gris]);
-          if (arr100.length == 100) {
+          arr100.push([rojo,verde,azul]);
+          if (arr100.length == 128) {
             arr.push(arr100);
             arr100 = [];
           }
@@ -162,14 +161,18 @@
         arr = [arr];
 
         var tensor = tf.tensor4d(arr);
+        //tensor = tf.tile(tensor, [null, 1.6410256410256410256410256410256, 1, 3]);
+        const clases = ["Pájaro", "Gato", "Perro", "Pez", "Salvaje"];
+
         var resultado1 = modelo1.predict(tensor).dataSync();
         var resultado2 = modelo2.predict(tensor).dataSync();
         var resultado3 = modelo3.predict(tensor).dataSync();
 
-        var respuesta = (predictions1 + predictions2 + predictions3)/3.0;
-        
-        console.log(respuesta);
-        document.getElementById("resultado").innerHTML = respuesta;
+        const final_predictions = tf.div(tf.add(tf.add(resultado1, resultado2), resultado3), 3.0);
+        const maxIndex = final_predictions.argMax().dataSync();
+
+        console.log(clases[maxIndex]);
+        document.getElementById("resultado").innerHTML = clases[maxIndex];
     
       }
 
