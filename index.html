@@ -43,7 +43,58 @@
 
 
 
-      <div class="b-example-divider mb-0"></div>
+      <div class="b-example-divider mb-0">
+        <input type="file" id="inputImage" accept="image/*">
+        <img id="selectedImage" style="max-width: 300px; max-height: 300px;">
+        <div id="resultado2"></div>            
+        
+        <script>
+          async function loadImageAndConvertToTensor() {
+              const inputElement = document.getElementById('inputImage');
+              const selectedImage = document.getElementById('selectedImage');
+  
+              // Escuchar el evento change del input de archivo
+              inputElement.addEventListener('change', async (event) => {
+                  const file = event.target.files[0];
+                  if (file) {
+                      // Crear un objeto URL para mostrar la imagen seleccionada
+                      const imageUrl = URL.createObjectURL(file);
+                      selectedImage.src = imageUrl;
+  
+                      // Cargar la imagen y convertirla en un tensor
+                      const image = new Image();
+                      image.src = imageUrl;
+  
+                      image.onload = async () => {
+                          const resizedImage = tf.image.resizeBilinear(tf.browser.fromPixels(image), [128, 128]);
+                  
+                          // Cambiar la forma del tensor para que tenga 4 dimensiones
+                          const batchedTensor = resizedImage.expandDims(0); // Agregar una dimensión de lote
+          
+                          // Normalizar la imagen (0-255 a 0-1)
+                          const normalizedTensor = batchedTensor.div(255.0);
+  
+                          const clases = ["Pájaro", "Gato", "Perro", "Pez", "Salvaje"];
+
+                          var resultado1 = modelo1.predict(normalizedTensor).dataSync();
+                          var resultado2 = modelo2.predict(normalizedTensor).dataSync();
+                          var resultado3 = modelo3.predict(normalizedTensor).dataSync();
+                  
+                          const final_predictions = tf.div(tf.add(tf.add(resultado1, resultado2), resultado3), 3.0);
+                          const maxIndex = final_predictions.argMax().dataSync();
+                  
+                          console.log(clases[maxIndex]);
+                          document.getElementById("resultado2").innerHTML = clases[maxIndex];
+                  
+                      };
+                  }
+              });
+          }
+  
+          // Llamar a la función al cargar la página
+          loadImageAndConvertToTensor();
+      </script>
+      </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -171,12 +222,12 @@
         const final_predictions = tf.div(tf.add(tf.add(resultado1, resultado2), resultado3), 3.0);
         const maxIndex = final_predictions.argMax().dataSync();
 
-        console.log(clases[maxIndex]);
+        // console.log(clases[maxIndex]);
         document.getElementById("resultado").innerHTML = clases[maxIndex];
     
       }
 
-      setTimeout(predecir, 150);
+      setTimeout(predecir, 320);
     }
 
     /**
