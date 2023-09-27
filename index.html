@@ -43,8 +43,12 @@
 
 
 
-      <div class="b-example-divider mb-0">
-        <input type="file" id="inputImage" accept="image/*">
+      <div class="b-example-divider mb-0" style="display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;">
+        <input class="btn btn-primary mb-2" type="file" id="inputImage" accept="image/*">
+        <br>
         <img id="selectedImage" style="max-width: 300px; max-height: 300px;">
         <div id="resultado2"></div>            
         
