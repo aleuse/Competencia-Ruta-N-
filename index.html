@@ -87,7 +87,7 @@
                           const final_predictions = tf.div(tf.add(tf.add(resultado1, resultado2), resultado3), 3.0);
                           const maxIndex = final_predictions.argMax().dataSync();
                   
-                          document.getElementById("resultado2").innerHTML = clases[maxIndex] + "<br>" + (final_predictions.dataSync()[maxIndex] * 100).toFixed(2) + "%";
+                          document.getElementById("resultado2").innerHTML = clases[maxIndex];
                   
                       };
                   }
@@ -226,7 +226,7 @@
         const maxIndex = final_predictions.argMax().dataSync();
 
         // console.log(clases[maxIndex]);
-        document.getElementById("resultado").innerHTML = clases[maxIndex] + "\n" + (final_predictions.dataSync()[maxIndex] * 100).toFixed(2) + "%";
+        document.getElementById("resultado").innerHTML = clases[maxIndex];
     
       }
 
